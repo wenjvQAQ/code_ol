@@ -15,6 +15,7 @@ import {
 import { useFileStore } from '@/stores/fileStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { FileNode, FileTab } from '@/types';
+import NewFileModal from '@/components/Modal/NewFileModal';
 
 export default function FileTree() {
   const { files, expandedFolders, toggleFolder, createFile, createFolder, deleteFile, renameFile, getFile } = useFileStore();
@@ -22,6 +23,11 @@ export default function FileTree() {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: FileNode } | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [newFileModal, setNewFileModal] = useState<{ isOpen: boolean; type: 'file' | 'folder'; parentId: string | null }>({
+    isOpen: false,
+    type: 'file',
+    parentId: null
+  });
 
   const handleFileClick = (node: FileNode) => {
     if (node.type === 'file') {
@@ -41,11 +47,8 @@ export default function FileTree() {
   };
 
   const handleCreateFile = () => {
-    const name = prompt('Enter file name:', 'untitled.txt');
-    if (name) {
-      const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
-      createFile(name, parentId);
-    }
+    const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
+    setNewFileModal({ isOpen: true, type: 'file', parentId });
     setContextMenu(null);
   };
 
@@ -63,11 +66,8 @@ export default function FileTree() {
   };
 
   const handleCreateFolder = () => {
-    const name = prompt('Enter folder name:', 'newfolder');
-    if (name) {
-      const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
-      createFolder(name, parentId);
-    }
+    const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
+    setNewFileModal({ isOpen: true, type: 'folder', parentId });
     setContextMenu(null);
   };
 
@@ -255,6 +255,13 @@ export default function FileTree() {
           </button>
         </div>
       )}
+
+      <NewFileModal
+        isOpen={newFileModal.isOpen}
+        type={newFileModal.type}
+        initialParentId={newFileModal.parentId}
+        onClose={() => setNewFileModal({ ...newFileModal, isOpen: false })}
+      />
     </div>
   );
 }
