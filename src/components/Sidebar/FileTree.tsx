@@ -8,18 +8,26 @@ import {
   Plus,
   MoreHorizontal,
   Trash2,
-  Edit3
+  Edit3,
+  Download,
+  FolderPlus
 } from 'lucide-react';
 import { useFileStore } from '@/stores/fileStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { FileNode, FileTab } from '@/types';
+import NewFileModal from '@/components/Modal/NewFileModal';
 
 export default function FileTree() {
-  const { files, expandedFolders, toggleFolder, createFile, deleteFile, renameFile } = useFileStore();
+  const { files, expandedFolders, toggleFolder, createFile, createFolder, deleteFile, renameFile, getFile } = useFileStore();
   const { openFile } = useEditorStore();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: FileNode } | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [newFileModal, setNewFileModal] = useState<{ isOpen: boolean; type: 'file' | 'folder'; parentId: string | null }>({
+    isOpen: false,
+    type: 'file',
+    parentId: null
+  });
 
   const handleFileClick = (node: FileNode) => {
     if (node.type === 'file') {
@@ -39,11 +47,8 @@ export default function FileTree() {
   };
 
   const handleCreateFile = () => {
-    const name = prompt('Enter file name:', 'untitled.txt');
-    if (name) {
-      const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
-      createFile(name, parentId);
-    }
+    const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
+    setNewFileModal({ isOpen: true, type: 'file', parentId });
     setContextMenu(null);
   };
 
@@ -57,6 +62,41 @@ export default function FileTree() {
   const handleRename = (node: FileNode) => {
     setRenaming(node.id);
     setNewName(node.name);
+    setContextMenu(null);
+  };
+
+  const handleCreateFolder = () => {
+    const parentId = contextMenu?.node.type === 'folder' ? contextMenu.node.id : null;
+    setNewFileModal({ isOpen: true, type: 'folder', parentId });
+    setContextMenu(null);
+  };
+
+  const handleExport = (node: FileNode) => {
+    if (node.type === 'file' && node.content) {
+      const blob = new Blob([node.content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = node.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    setContextMenu(null);
+  };
+
+  const handleExportAll = () => {
+    const exportData = JSON.stringify(files, null, 2);
+    const blob = new Blob([exportData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cloud-code-project.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     setContextMenu(null);
   };
 
@@ -75,8 +115,8 @@ export default function FileTree() {
     return (
       <div key={node.id}>
         <div
-          className="flex items-center gap-1 px-2 py-1 cursor-pointer hover:bg-[var(--bg-tertiary)] rounded transition-colors group"
-          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+          className="flex items-center gap-1 px-3 py-2 cursor-pointer hover:bg-[var(--bg-tertiary)] rounded transition-colors group"
+          style={{ paddingLeft: `${depth * 16 + 12}px` }}
           onClick={() => isFolder ? toggleFolder(node.id) : handleFileClick(node)}
           onContextMenu={(e) => handleContextMenu(e, node)}
         >
@@ -145,16 +185,28 @@ export default function FileTree() {
         <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
           Explorer
         </span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleCreateFile();
-          }}
-          className="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
-          title="New File"
-        >
-          <Plus className="w-4 h-4 text-[var(--text-secondary)]" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCreateFile();
+            }}
+            className="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
+            title="New File"
+          >
+            <File className="w-4 h-4 text-[var(--text-secondary)]" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCreateFolder();
+            }}
+            className="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
+            title="New Folder"
+          >
+            <FolderPlus className="w-4 h-4 text-[var(--text-secondary)]" />
+          </button>
+        </div>
       </div>
       
       <div>
@@ -163,7 +215,7 @@ export default function FileTree() {
 
       {contextMenu && (
         <div
-          className="fixed z-50 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md shadow-lg py-1 min-w-[150px]"
+          className="fixed z-50 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md shadow-lg py-1 min-w-[180px]"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -176,12 +228,36 @@ export default function FileTree() {
           </button>
           <button
             className="w-full px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-tertiary)] flex items-center gap-2 text-[var(--text-primary)]"
+            onClick={() => handleCreateFolder()}
+          >
+            <FolderPlus className="w-4 h-4" />
+            New Folder
+          </button>
+          <div className="border-t border-[var(--border-color)] my-1" />
+          {contextMenu.node.type === 'file' && (
+            <button
+              className="w-full px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-tertiary)] flex items-center gap-2 text-[var(--text-primary)]"
+              onClick={() => handleExport(contextMenu.node)}
+            >
+              <Download className="w-4 h-4" />
+              Export File
+            </button>
+          )}
+          <button
+            className="w-full px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-tertiary)] flex items-center gap-2 text-[var(--text-primary)]"
+            onClick={() => handleExportAll()}
+          >
+            <Download className="w-4 h-4" />
+            Export All
+          </button>
+          <div className="border-t border-[var(--border-color)] my-1" />
+          <button
+            className="w-full px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-tertiary)] flex items-center gap-2 text-[var(--text-primary)]"
             onClick={() => handleRename(contextMenu.node)}
           >
             <Edit3 className="w-4 h-4" />
             Rename
           </button>
-          <div className="border-t border-[var(--border-color)] my-1" />
           <button
             className="w-full px-3 py-1.5 text-left text-sm hover:bg-[var(--bg-tertiary)] flex items-center gap-2 text-[var(--accent-red)]"
             onClick={() => handleDelete(contextMenu.node)}
@@ -191,6 +267,13 @@ export default function FileTree() {
           </button>
         </div>
       )}
+
+      <NewFileModal
+        isOpen={newFileModal.isOpen}
+        type={newFileModal.type}
+        initialParentId={newFileModal.parentId}
+        onClose={() => setNewFileModal({ ...newFileModal, isOpen: false })}
+      />
     </div>
   );
 }

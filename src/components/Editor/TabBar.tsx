@@ -9,11 +9,11 @@ export default function TabBar() {
   }
 
   return (
-    <div className="h-9 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center overflow-x-auto">
+    <div className="h-10 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center overflow-x-auto">
       {openFiles.map((file) => (
         <div
           key={file.id}
-          className={`group flex items-center gap-2 px-3 h-full cursor-pointer border-r border-[var(--border-color)] transition-colors ${
+          className={`group flex items-center gap-1.5 px-3 h-full cursor-pointer border-r border-[var(--border-color)] transition-colors ${
             activeFileId === file.id
               ? 'bg-[var(--bg-primary)] border-t-2 border-t-[var(--accent-blue)]'
               : 'hover:bg-[var(--bg-tertiary)]'
@@ -33,9 +33,9 @@ export default function TabBar() {
               e.stopPropagation();
               closeFile(file.id);
             }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[var(--bg-tertiary)] rounded transition-all"
+            className="opacity-70 group-hover:opacity-100 p-1 hover:bg-[var(--bg-tertiary)] rounded transition-all"
           >
-            <X className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
+            <X className="w-4 h-4 text-[var(--text-secondary)]" />
           </button>
         </div>
       ))}

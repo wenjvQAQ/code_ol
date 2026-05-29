@@ -65,6 +65,123 @@ export default function CodeEditor() {
       },
     });
 
+    // 注册 JavaScript/TypeScript 补全提供器
+    monaco.languages.registerCompletionItemProvider('javascript', {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+        
+        return {
+          suggestions: [
+            { label: 'console.log', kind: monaco.languages.CompletionItemKind.Function, insertText: 'console.log()', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, documentation: '输出到控制台' },
+            { label: 'console.error', kind: monaco.languages.CompletionItemKind.Function, insertText: 'console.error()', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, documentation: '输出错误' },
+            { label: 'function', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'function ${1:name}(${2:params}) {\n\t${3:// code}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, documentation: '函数声明' },
+            { label: 'const', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'const ', range },
+            { label: 'let', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'let ', range },
+            { label: 'if', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'if (${1:condition}) {\n\t${2:// code}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'for', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {\n\t${3:// code}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'forEach', kind: monaco.languages.CompletionItemKind.Method, insertText: '.forEach(${1:item} => ${2:// code})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'map', kind: monaco.languages.CompletionItemKind.Method, insertText: '.map(${1:item} => ${2:// code})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'filter', kind: monaco.languages.CompletionItemKind.Method, insertText: '.filter(${1:item} => ${2:// condition})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'return', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'return ', range },
+            { label: 'async', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'async ', range },
+            { label: 'await', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'await ', range },
+            { label: 'try/catch', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'try {\n\t${1:// code}\n} catch (${2:error}) {\n\t${3:// handle error}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'setTimeout', kind: monaco.languages.CompletionItemKind.Function, insertText: 'setTimeout(() => {\n\t${1:// code}\n}, ${2:1000})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'setInterval', kind: monaco.languages.CompletionItemKind.Function, insertText: 'setInterval(() => {\n\t${1:// code}\n}, ${2:1000})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+          ]
+        };
+      }
+    });
+
+    monaco.languages.registerCompletionItemProvider('typescript', {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+        
+        return {
+          suggestions: [
+            { label: 'console.log', kind: monaco.languages.CompletionItemKind.Function, insertText: 'console.log()', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, documentation: '输出到控制台' },
+            { label: 'interface', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'interface ${1:Name} {\n\t${2:prop}: ${3:type};\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'type', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'type ', range },
+            { label: 'const', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'const ', range },
+            { label: 'let', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'let ', range },
+            { label: 'function', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'function ${1:name}(${2:params}: ${3:type}): ${4:void} {\n\t${5:// code}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'async/await', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'async function ${1:name}() {\n\tconst ${2:result} = await ${3:promise};\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+          ]
+        };
+      }
+    });
+
+    monaco.languages.registerCompletionItemProvider('html', {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+        
+        return {
+          suggestions: [
+            { label: 'div', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<div>${1:content}</div>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'span', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<span>${1:content}</span>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'p', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<p>${1:content}</p>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'a', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<a href="${1:url}">${2:link text}</a>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'img', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<img src="${1:src}" alt="${2:alt}">', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'ul', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<ul>\n\t<li>${1:item 1}</li>\n</ul>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'ol', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<ol>\n\t<li>${1:item 1}</li>\n</ol>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'button', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<button>${1:text}</button>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'input', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<input type="${1:text}">', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'script', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<script>\n\t${1:// code}\n</script>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+            { label: 'style', kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<style>\n\t${1:/* styles */}\n</style>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range },
+          ]
+        };
+      }
+    });
+
+    monaco.languages.registerCompletionItemProvider('css', {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+        
+        return {
+          suggestions: [
+            { label: 'display: flex', kind: monaco.languages.CompletionItemKind.Property, insertText: 'display: flex;', range },
+            { label: 'display: grid', kind: monaco.languages.CompletionItemKind.Property, insertText: 'display: grid;', range },
+            { label: 'flex-direction', kind: monaco.languages.CompletionItemKind.Property, insertText: 'flex-direction: ', range },
+            { label: 'justify-content', kind: monaco.languages.CompletionItemKind.Property, insertText: 'justify-content: ', range },
+            { label: 'align-items', kind: monaco.languages.CompletionItemKind.Property, insertText: 'align-items: ', range },
+            { label: 'margin', kind: monaco.languages.CompletionItemKind.Property, insertText: 'margin: ', range },
+            { label: 'padding', kind: monaco.languages.CompletionItemKind.Property, insertText: 'padding: ', range },
+            { label: 'color', kind: monaco.languages.CompletionItemKind.Property, insertText: 'color: ', range },
+            { label: 'background', kind: monaco.languages.CompletionItemKind.Property, insertText: 'background: ', range },
+            { label: 'font-size', kind: monaco.languages.CompletionItemKind.Property, insertText: 'font-size: ', range },
+            { label: 'width', kind: monaco.languages.CompletionItemKind.Property, insertText: 'width: ', range },
+            { label: 'height', kind: monaco.languages.CompletionItemKind.Property, insertText: 'height: ', range },
+            { label: 'border', kind: monaco.languages.CompletionItemKind.Property, insertText: 'border: ', range },
+            { label: 'border-radius', kind: monaco.languages.CompletionItemKind.Property, insertText: 'border-radius: ', range },
+          ]
+        };
+      }
+    });
+
     editor.updateOptions({
       fontFamily: "'JetBrains Mono', monospace",
       fontSize: 14,
@@ -74,6 +191,12 @@ export default function CodeEditor() {
       smoothScrolling: true,
       cursorBlinking: 'smooth',
       cursorSmoothCaretAnimation: 'on',
+      quickSuggestions: { other: true, comments: true, strings: true },
+      suggestOnTriggerCharacters: true,
+      wordBasedSuggestions: 'currentDocument',
+      tabCompletion: 'on',
+      acceptSuggestionOnEnter: 'on',
+      suggestSelection: 'first',
     });
   };
 

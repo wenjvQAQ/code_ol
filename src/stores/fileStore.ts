@@ -4,7 +4,7 @@ import { FileNode } from '@/types';
 interface FileState {
   files: FileNode[];
   expandedFolders: Set<string>;
-  createFile: (name: string, parentId?: string | null) => string;
+  createFile: (name: string, parentId?: string | null, content?: string) => string;
   createFolder: (name: string, parentId?: string | null) => string;
   deleteFile: (id: string) => void;
   renameFile: (id: string, newName: string) => void;
@@ -155,14 +155,14 @@ export const useFileStore = create<FileState>((set, get) => ({
   files: getInitialFiles(),
   expandedFolders: new Set(['folder-src']),
 
-  createFile: (name, parentId = null) => {
+  createFile: (name, parentId = null, content = '') => {
     const id = generateId();
     const newFile: FileNode = {
       id,
       name,
       type: 'file',
       parentId,
-      content: '',
+      content,
       language: getLanguage(name),
       createdAt: Date.now(),
       updatedAt: Date.now(),

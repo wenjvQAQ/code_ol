@@ -7,6 +7,8 @@ interface TerminalState {
   history: string[];
   historyIndex: number;
   addLine: (line: Omit<TerminalLine, 'id' | 'timestamp'>) => void;
+  appendOutput: (output: string) => void;
+  appendError: (error: string) => void;
   setInput: (input: string) => void;
   executeCommand: (command: string) => void;
   clearTerminal: () => void;
@@ -93,6 +95,24 @@ export const useTerminalStore = create<TerminalState>((set, get) => ({
     set((state) => ({
       lines: [...state.lines, { ...line, id: generateId(), timestamp: Date.now() }],
     }));
+  },
+
+  appendOutput: (output) => {
+    const { addLine } = get();
+    output.split('\n').forEach(line => {
+      if (line.trim()) {
+        addLine({ type: 'output', content: line });
+      }
+    });
+  },
+
+  appendError: (error) => {
+    const { addLine } = get();
+    error.split('\n').forEach(line => {
+      if (line.trim()) {
+        addLine({ type: 'error', content: line });
+      }
+    });
   },
 
   setInput: (input) => {
