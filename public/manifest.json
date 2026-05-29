@@ -1,0 +1,16 @@
+{
+  "name": "Cloud Code Studio",
+  "short_name": "Code Studio",
+  "description": "A VS Code-like online code editor",
+  "start_url": "/code_ol/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#0f3460",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
